@@ -1,4 +1,4 @@
-//+build !cadence
+//+build cadence
 
 package providers
 
@@ -45,7 +45,7 @@ func NewObjectStore(ctx *ObjectStoreContext, logger logrus.FieldLogger) (objects
 		return amazon.NewObjectStore(ctx.Location, ctx.Secret, ctx.Organization, db, logger)
 
 	case providers.Azure:
-		return azure.NewObjectStore(ctx.Location, ctx.ResourceGroup, ctx.StorageAccount, ctx.Secret, ctx.Organization, db, logger), nil
+		return azure.NewObjectStore(ctx.Location, ctx.ResourceGroup, ctx.StorageAccount, ctx.Secret, ctx.Organization, config.CadenceClient(), db, logger), nil
 
 	case providers.Google:
 		return google.NewObjectStore(ctx.Organization, verify.CreateServiceAccount(ctx.Secret.Values), ctx.Location, db, logger), nil
