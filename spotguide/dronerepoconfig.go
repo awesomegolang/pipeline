@@ -2,23 +2,23 @@ package spotguide
 
 import (
 	"github.com/banzaicloud/pipeline/pkg/cluster"
+	"github.com/banzaicloud/pipeline/pkg/helm"
 	libcompose "github.com/docker/libcompose/yaml"
 )
 
 // nolint
 // droneRepoConfig defines a pipeline configuration.
 type droneRepoConfig struct {
-	Cache     libcompose.Stringorslice      `yaml:"cache,omitempty"`
-	Platform  *string                       `yaml:"platform,omitempty"`
-	Branches  *droneConstraint              `yaml:"branches,omitempty"`
-	Workspace *droneWorkspace               `yaml:"workspace,omitempty"`
-	Cluster   *cluster.CreateClusterRequest `yaml:"cluster,omitempty"`
-	Clone     map[string]*droneContainer    `yaml:"clone,omitempty"`
-	Pipeline  map[string]*droneContainer    `yaml:"pipeline,omitempty"`
-	Services  map[string]*droneContainer    `yaml:"services,omitempty"`
-	Networks  map[string]*droneNetwork      `yaml:"networks,omitempty"`
-	Volumes   map[string]*droneVolume       `yaml:"volumes,omitempty"`
-	Labels    libcompose.SliceorMap         `yaml:"labels,omitempty"`
+	Cache     libcompose.Stringorslice   `yaml:"cache,omitempty"`
+	Platform  *string                    `yaml:"platform,omitempty"`
+	Branches  *droneConstraint           `yaml:"branches,omitempty"`
+	Workspace *droneWorkspace            `yaml:"workspace,omitempty"`
+	Clone     map[string]*droneContainer `yaml:"clone,omitempty"`
+	Pipeline  map[string]*droneContainer `yaml:"pipeline,omitempty"`
+	Services  map[string]*droneContainer `yaml:"services,omitempty"`
+	Networks  map[string]*droneNetwork   `yaml:"networks,omitempty"`
+	Volumes   map[string]*droneVolume    `yaml:"volumes,omitempty"`
+	Labels    libcompose.SliceorMap      `yaml:"labels,omitempty"`
 }
 
 // nolint
@@ -39,55 +39,56 @@ type droneAuthConfig struct {
 // nolint
 // droneContainer defines a container.
 type droneContainer struct {
-	AuthConfig    *droneAuthConfig           `yaml:"auth_config,omitempty"`
-	CapAdd        []string                   `yaml:"cap_add,omitempty"`
-	CapDrop       []string                   `yaml:"cap_drop,omitempty"`
-	Command       libcompose.Command         `yaml:"command,omitempty"`
-	Commands      libcompose.Stringorslice   `yaml:"commands,omitempty"`
-	CpuQuota      *libcompose.StringorInt    `yaml:"cpu_quota,omitempty"`
-	CpuSet        *string                    `yaml:"cpuset,omitempty"`
-	CpuShares     *libcompose.StringorInt    `yaml:"cpu_shares,omitempty"`
-	Detached      *bool                      `yaml:"detach,omitempty"`
-	Devices       []string                   `yaml:"devices,omitempty"`
-	Tmpfs         []string                   `yaml:"tmpfs,omitempty"`
-	Dns           libcompose.Stringorslice   `yaml:"dns,omitempty"`
-	DnsSearch     libcompose.Stringorslice   `yaml:"dns_search,omitempty"`
-	Entrypoint    libcompose.Command         `yaml:"entrypoint,omitempty"`
-	Environment   libcompose.SliceorMap      `yaml:"environment,omitempty"`
-	ExtraHosts    []string                   `yaml:"extra_hosts,omitempty"`
-	Group         *string                    `yaml:"group,omitempty"`
-	Image         *string                    `yaml:"image,omitempty"`
-	Isolation     *string                    `yaml:"isolation,omitempty"`
-	Labels        libcompose.SliceorMap      `yaml:"labels,omitempty"`
-	MemLimit      *libcompose.MemStringorInt `yaml:"mem_limit,omitempty"`
-	MemSwapLimit  *libcompose.MemStringorInt `yaml:"memswap_limit,omitempty"`
-	MemSwappiness *libcompose.MemStringorInt `yaml:"mem_swappiness,omitempty"`
-	Name          *string                    `yaml:"name,omitempty"`
-	NetworkMode   *string                    `yaml:"network_mode,omitempty"`
-	IpcMode       *string                    `yaml:"ipc_mode,omitempty"`
-	Networks      *libcompose.Networks       `yaml:"networks,omitempty"`
-	Ports         []int32                    `yaml:"ports,omitempty"`
-	Privileged    *bool                      `yaml:"privileged,omitempty"`
-	Pull          *bool                      `yaml:"pull,omitempty"`
-	ShmSize       *libcompose.MemStringorInt `yaml:"shm_size,omitempty"`
-	Ulimits       *libcompose.Ulimits        `yaml:"ulimits,omitempty"`
-	Volumes       *libcompose.Volumes        `yaml:"volumes,omitempty"`
-	Secrets       []string                   `yaml:"secrets,omitempty"`
-	Sysctls       libcompose.SliceorMap      `yaml:"sysctls,omitempty"`
-	Constraints   *droneConstraints          `yaml:"when,omitempty"`
-	Vargs         map[string]interface{}     `yaml:",inline,omitempty"`
-	Dockerfile    *string                    `yaml:"dockerfile,omitempty"`
-	Repo          *string                    `yaml:"repo,omitempty"`
-	Tags          *string                    `yaml:"tags,omitempty"`
-	Log           *string                    `yaml:"log,omitempty"`
-	Deployment    *droneDeploymentContainer  `yaml:"deployment,omitempty"`
+	AuthConfig    *droneAuthConfig                    `yaml:"auth_config,omitempty"`
+	CapAdd        []string                            `yaml:"cap_add,omitempty"`
+	CapDrop       []string                            `yaml:"cap_drop,omitempty"`
+	Command       libcompose.Command                  `yaml:"command,omitempty"`
+	Commands      libcompose.Stringorslice            `yaml:"commands,omitempty"`
+	CpuQuota      *libcompose.StringorInt             `yaml:"cpu_quota,omitempty"`
+	CpuSet        *string                             `yaml:"cpuset,omitempty"`
+	CpuShares     *libcompose.StringorInt             `yaml:"cpu_shares,omitempty"`
+	Detached      *bool                               `yaml:"detach,omitempty"`
+	Devices       []string                            `yaml:"devices,omitempty"`
+	Tmpfs         []string                            `yaml:"tmpfs,omitempty"`
+	Dns           libcompose.Stringorslice            `yaml:"dns,omitempty"`
+	DnsSearch     libcompose.Stringorslice            `yaml:"dns_search,omitempty"`
+	Entrypoint    libcompose.Command                  `yaml:"entrypoint,omitempty"`
+	Environment   libcompose.SliceorMap               `yaml:"environment,omitempty"`
+	ExtraHosts    []string                            `yaml:"extra_hosts,omitempty"`
+	Group         *string                             `yaml:"group,omitempty"`
+	Image         *string                             `yaml:"image,omitempty"`
+	Isolation     *string                             `yaml:"isolation,omitempty"`
+	Labels        libcompose.SliceorMap               `yaml:"labels,omitempty"`
+	MemLimit      *libcompose.MemStringorInt          `yaml:"mem_limit,omitempty"`
+	MemSwapLimit  *libcompose.MemStringorInt          `yaml:"memswap_limit,omitempty"`
+	MemSwappiness *libcompose.MemStringorInt          `yaml:"mem_swappiness,omitempty"`
+	Name          *string                             `yaml:"name,omitempty"`
+	NetworkMode   *string                             `yaml:"network_mode,omitempty"`
+	IpcMode       *string                             `yaml:"ipc_mode,omitempty"`
+	Networks      *libcompose.Networks                `yaml:"networks,omitempty"`
+	Ports         []int32                             `yaml:"ports,omitempty"`
+	Privileged    *bool                               `yaml:"privileged,omitempty"`
+	Pull          *bool                               `yaml:"pull,omitempty"`
+	ShmSize       *libcompose.MemStringorInt          `yaml:"shm_size,omitempty"`
+	Ulimits       *libcompose.Ulimits                 `yaml:"ulimits,omitempty"`
+	Volumes       *libcompose.Volumes                 `yaml:"volumes,omitempty"`
+	Secrets       []string                            `yaml:"secrets,omitempty"`
+	Sysctls       libcompose.SliceorMap               `yaml:"sysctls,omitempty"`
+	Constraints   *droneConstraints                   `yaml:"when,omitempty"`
+	Vargs         map[string]interface{}              `yaml:",inline,omitempty"`
+	Dockerfile    *string                             `yaml:"dockerfile,omitempty"`
+	Repo          *string                             `yaml:"repo,omitempty"`
+	Tags          *string                             `yaml:"tags,omitempty"`
+	Log           *string                             `yaml:"log,omitempty"`
+	Cluster       *cluster.CreateClusterRequest       `yaml:"cluster,omitempty"`
+	Deployment    *helm.CreateUpdateDeploymentRequest `yaml:"deployment,omitempty"`
 }
 
-type droneDeploymentContainer struct {
-	Name        string                 `yaml:"name,omitempty"`
-	ReleaseName string                 `yaml:"releaseName,omitempty"`
-	Values      map[string]interface{} `yaml:"values,omitempty"`
-}
+// type droneDeploymentContainer struct {
+// 	Name        string                 `yaml:"name,omitempty"`
+// 	ReleaseName string                 `yaml:"releaseName,omitempty"`
+// 	Values      map[string]interface{} `yaml:"values,omitempty"`
+// }
 
 // nolint
 // droneConstraints defines a set of runtime constraints.

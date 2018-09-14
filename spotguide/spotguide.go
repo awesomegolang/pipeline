@@ -27,6 +27,7 @@ const SpotguideGithubTopic = "spotguide"
 const SpotguideGithubOrganization = "banzaicloud"
 const SpotguideYAMLPath = ".banzaicloud/spotguide.yaml"
 const PipelineYAMLPath = ".banzaicloud/pipeline.yaml"
+const CreateClusterStep = "create_cluster"
 const DeployApplicationStep = "deploy_application"
 
 var ctx = context.Background()
@@ -72,12 +73,12 @@ func (s *Repo) AfterFind() error {
 }
 
 type LaunchRequest struct {
-	SpotguideName    string                       `json:"spotguideName" binding:"required"`
-	RepoOrganization string                       `json:"repoOrganization" binding:"required"`
-	RepoName         string                       `json:"repoName" binding:"required"`
-	Cluster          cluster.CreateClusterRequest `json:"cluster"`
-	Secrets          []secret.CreateSecretRequest `json:"secrets"`
-	Values           map[string]interface{}       `json:"values"` // Values passed to the Helm deployment in the 'deploy_application' step
+	SpotguideName    string                        `json:"spotguideName" binding:"required"`
+	RepoOrganization string                        `json:"repoOrganization" binding:"required"`
+	RepoName         string                        `json:"repoName" binding:"required"`
+	Cluster          *cluster.CreateClusterRequest `json:"cluster"`
+	Secrets          []secret.CreateSecretRequest  `json:"secrets"`
+	Values           map[string]interface{}        `json:"values"` // Values passed to the Helm deployment in the 'deploy_application' step
 }
 
 func (r LaunchRequest) RepoFullname() string {
@@ -437,6 +438,11 @@ func createDroneRepoConfig(initConfig []byte, request *LaunchRequest) (*droneRep
 		return nil, err
 	}
 
+	// Configure cluster
+	if err := droneRepoConfigCluster(request, repoConfig); err != nil {
+		return nil, err
+	}
+
 	// Configure secrets
 	if err := droneRepoConfigSecrets(request, repoConfig); err != nil {
 		return nil, err
@@ -448,6 +454,27 @@ func createDroneRepoConfig(initConfig []byte, request *LaunchRequest) (*droneRep
 	}
 
 	return repoConfig, nil
+}
+
+func droneRepoConfigCluster(request *LaunchRequest, repoConfig *droneRepoConfig) error {
+
+	// Find CreateClusterStep step and transform it if there are is an incoming Cluster
+	if clusterStep, ok := repoConfig.Pipeline[CreateClusterStep]; ok && request.Cluster != nil {
+
+		// Merge the cluster from the request into the existing cluster value
+		cluster, err := json.Marshal(request.Cluster)
+		if err != nil {
+			return err
+		}
+
+		err = json.Unmarshal(cluster, &clusterStep.Cluster)
+		if err != nil {
+			return err
+		}
+	} else {
+		log.Info("deploy_application not present in pipeline.yaml, skipping transformation")
+	}
+	return nil
 }
 
 func droneRepoConfigSecrets(request *LaunchRequest, repoConfig *droneRepoConfig) error {
