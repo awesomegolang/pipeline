@@ -1,35 +1,24 @@
 package spotguide
 
 import (
+	"github.com/banzaicloud/pipeline/pkg/cluster"
 	libcompose "github.com/docker/libcompose/yaml"
 )
 
 // nolint
 // droneRepoConfig defines a pipeline configuration.
 type droneRepoConfig struct {
-	Cache     libcompose.Stringorslice   `yaml:"cache,omitempty"`
-	Platform  *string                    `yaml:"platform,omitempty"`
-	Branches  *droneConstraint           `yaml:"branches,omitempty"`
-	Workspace *droneWorkspace            `yaml:"workspace,omitempty"`
-	Cluster   *droneKubernetesCluster    `yaml:"cluster,omitempty"`
-	Clone     map[string]*droneContainer `yaml:"clone,omitempty"`
-	Pipeline  map[string]*droneContainer `yaml:"pipeline,omitempty"`
-	Services  map[string]*droneContainer `yaml:"services,omitempty"`
-	Networks  map[string]*droneNetwork   `yaml:"networks,omitempty"`
-	Volumes   map[string]*droneVolume    `yaml:"volumes,omitempty"`
-	Labels    libcompose.SliceorMap      `yaml:"labels,omitempty"`
-}
-
-// nolint
-// droneKubernetesCluster defines a cluster that has to be created before executing the rest of the Pipeline.
-type droneKubernetesCluster struct {
-	Name     *string `yaml:"name,omitempty"`
-	Provider *string `yaml:"provider,omitempty"`
-	SecretID *string `yaml:"secret_id,omitempty"`
-
-	GoogleProject    *string `yaml:"google_project,omitempty"`
-	GoogleNodeCount  *int    `yaml:"google_node_count,omitempty"`
-	GoogleGKEVersion *string `yaml:"google_gke_version,omitempty"`
+	Cache     libcompose.Stringorslice      `yaml:"cache,omitempty"`
+	Platform  *string                       `yaml:"platform,omitempty"`
+	Branches  *droneConstraint              `yaml:"branches,omitempty"`
+	Workspace *droneWorkspace               `yaml:"workspace,omitempty"`
+	Cluster   *cluster.CreateClusterRequest `yaml:"cluster,omitempty"`
+	Clone     map[string]*droneContainer    `yaml:"clone,omitempty"`
+	Pipeline  map[string]*droneContainer    `yaml:"pipeline,omitempty"`
+	Services  map[string]*droneContainer    `yaml:"services,omitempty"`
+	Networks  map[string]*droneNetwork      `yaml:"networks,omitempty"`
+	Volumes   map[string]*droneVolume       `yaml:"volumes,omitempty"`
+	Labels    libcompose.SliceorMap         `yaml:"labels,omitempty"`
 }
 
 // nolint

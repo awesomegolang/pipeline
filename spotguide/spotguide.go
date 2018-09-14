@@ -13,6 +13,7 @@ import (
 
 	"github.com/banzaicloud/pipeline/auth"
 	"github.com/banzaicloud/pipeline/config"
+	"github.com/banzaicloud/pipeline/pkg/cluster"
 	"github.com/banzaicloud/pipeline/secret"
 	"github.com/google/go-github/github"
 	"github.com/goph/emperror"
@@ -71,9 +72,10 @@ func (s *Repo) AfterFind() error {
 }
 
 type LaunchRequest struct {
-	SpotguideName    string                       `json:"spotguideName"`
-	RepoOrganization string                       `json:"repoOrganization"`
-	RepoName         string                       `json:"repoName"`
+	SpotguideName    string                       `json:"spotguideName" binding:"required"`
+	RepoOrganization string                       `json:"repoOrganization" binding:"required"`
+	RepoName         string                       `json:"repoName" binding:"required"`
+	Cluster          cluster.CreateClusterRequest `json:"cluster"`
 	Secrets          []secret.CreateSecretRequest `json:"secrets"`
 	Values           map[string]interface{}       `json:"values"` // Values passed to the Helm deployment in the 'deploy_application' step
 }
@@ -205,7 +207,7 @@ func LaunchSpotguide(request *LaunchRequest, httpRequest *http.Request, orgID, u
 
 	githubClient, err := newGithubClientForUser(userID)
 	if err != nil {
-		return errors.Wrap(err, "failed to create GitHub client")
+		return errors.Wrap(err, "Failed to create GitHub client")
 	}
 
 	err = createGithubRepo(githubClient, request, userID, sourceRepo)
